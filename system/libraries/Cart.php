@@ -6,11 +6,14 @@
  *
  * @package		CodeIgniter
  * @author		ExpressionEngine Dev Team
- * @copyright	Copyright (c) 2006 - 2012, EllisLab, Inc.
+ * @copyright	Copyright (c) 2006 - 2011, EllisLab, Inc.
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
  * @since		Version 1.0
  * @filesource
+ * 
+ * Modified by Kenji Suzuki, 2009/10/31
+ * - Fix $product_name_rules which does not allow Japanese charactors (Thanks to Hajimesawa)
  */
 
 // ------------------------------------------------------------------------
@@ -28,7 +31,7 @@ class CI_Cart {
 
 	// These are the regular expression rules that we use to validate the product ID and product name
 	var $product_id_rules	= '\.a-z0-9_-'; // alpha-numeric, dashes, underscores, or periods
-	var $product_name_rules	= '\.\:\-_ a-z0-9'; // alpha-numeric, dashes, underscores, colons or periods
+	var $product_name_rules	= '一-龠ぁ-んァ-ヴーａ-ｚＡ-Ｚ０-９\.\:\-_ a-z0-9'; // Japanese, alpha-numeric, dashes, underscores, colons or periods
 
 	// Private variables.  Do not change!
 	var $CI;
@@ -99,7 +102,7 @@ class CI_Cart {
 		$save_cart = FALSE;
 		if (isset($items['id']))
 		{
-			if (($rowid = $this->_insert($items)))
+			if ($this->_insert($items) == TRUE)
 			{
 				$save_cart = TRUE;
 			}
@@ -110,7 +113,7 @@ class CI_Cart {
 			{
 				if (is_array($val) AND isset($val['id']))
 				{
-					if ($this->_insert($val))
+					if ($this->_insert($val) == TRUE)
 					{
 						$save_cart = TRUE;
 					}
@@ -122,7 +125,7 @@ class CI_Cart {
 		if ($save_cart == TRUE)
 		{
 			$this->_save_cart();
-			return isset($rowid) ? $rowid : TRUE;
+			return TRUE;
 		}
 
 		return FALSE;
@@ -244,7 +247,7 @@ class CI_Cart {
 		}
 
 		// Woot!
-		return $rowid;
+		return TRUE;
 	}
 
 	// --------------------------------------------------------------------
